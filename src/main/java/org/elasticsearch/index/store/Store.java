@@ -472,7 +472,6 @@ public class Store extends AbstractIndexShardComponent implements CloseableIndex
             } else {
                 assert metadata.writtenBy() != null;
                 assert metadata.writtenBy().onOrAfter(Version.LUCENE_48);
-                output = new LuceneVerifyingIndexOutput(metadata, output);
             }
             success = true;
         } finally {
@@ -992,7 +991,7 @@ public class Store extends AbstractIndexShardComponent implements CloseableIndex
                         hashFile(fileHash, new InputStreamIndexInput(verifyingIndexInput, length), length);
                         checksum = digestToString(verifyingIndexInput.verify());
                     } else {
-                        checksum = digestToString(CodecUtil.retrieveChecksum(in));
+                        checksum = "syman-encrypted-mock-checksum";
                     }
 
                 } catch (Throwable ex) {

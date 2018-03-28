@@ -64,7 +64,7 @@ public class FsChannelSnapshot implements Translog.Snapshot {
     public FsChannelSnapshot(long id, RafReference raf, long length, int totalOperations) throws FileNotFoundException {
         this.id = id;
         this.raf = raf;
-        this.channel = raf.raf().getChannel();
+        this.channel = raf.channel();
         this.length = length;
         this.totalOperations = totalOperations;
     }

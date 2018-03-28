@@ -27,6 +27,7 @@ import org.elasticsearch.common.io.FileSystemUtils;
 import org.elasticsearch.common.io.stream.BytesStreamInput;
 import org.elasticsearch.common.io.stream.ReleasableBytesStreamOutput;
 import org.elasticsearch.common.lease.Releasables;
+import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.util.BigArrays;
@@ -38,9 +39,11 @@ import org.elasticsearch.index.store.IndexStore;
 import org.elasticsearch.index.translog.Translog;
 import org.elasticsearch.index.translog.TranslogException;
 import org.elasticsearch.index.translog.TranslogStats;
+import org.elasticsearch.index.translog.TranslogStream;
 import org.elasticsearch.index.translog.TranslogStreams;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Path;
@@ -233,6 +236,10 @@ public class FsTranslog extends AbstractIndexShardComponent implements Translog 
         return deleted;
     }
 
+    protected RafReference createRafReference(File file, ESLogger logger) throws FileNotFoundException {
+        return new RafReference(file, logger);
+    }
+
     @Override
     public void newTranslog(long id) throws TranslogException {
         rwl.writeLock().lock();
@@ -248,7 +255,7 @@ public class FsTranslog extends AbstractIndexShardComponent implements Translog 
                 }
             }
             try {
-                newFile = type.create(shardId, id, new RafReference(new File(location, "translog-" + id), logger), bufferSize);
+                newFile = type.create(shardId, id, createRafReference(new File(location, "translog-" + id), logger), bufferSize);
             } catch (IOException e) {
                 throw new TranslogException(shardId, "failed to create new translog file", e);
             }
@@ -282,7 +289,7 @@ public class FsTranslog extends AbstractIndexShardComponent implements Translog 
                     location = file;
                 }
             }
-            this.trans = type.create(shardId, id, new RafReference(new File(location, "translog-" + id), logger), transientBufferSize);
+            this.trans = type.create(shardId, id, createRafReference(new File(location, "translog-" + id), logger), transientBufferSize);
         } catch (IOException e) {
             throw new TranslogException(shardId, "failed to create new translog file", e);
         } finally {
@@ -340,6 +347,11 @@ public class FsTranslog extends AbstractIndexShardComponent implements Translog 
             return this.current;
         }
         return null;
+    }
+
+    @Override
+    public TranslogStream translogStreamFor(File translogFile) throws IOException {
+        return TranslogStreams.translogStreamFor(translogFile);
     }
 
     /**

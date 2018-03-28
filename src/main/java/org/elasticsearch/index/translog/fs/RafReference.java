@@ -20,6 +20,8 @@
 package org.elasticsearch.index.translog.fs;
 
 import org.elasticsearch.common.logging.ESLogger;
+import org.elasticsearch.index.translog.TranslogStream;
+import org.elasticsearch.index.translog.TranslogStreams;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -85,5 +87,9 @@ public class RafReference {
                 // ignore
             }
         }
+    }
+
+    public TranslogStream translogStreamFor() throws IOException {
+        return TranslogStreams.translogStreamFor(this.file());
     }
 }

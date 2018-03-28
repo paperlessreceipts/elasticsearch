@@ -63,7 +63,7 @@ public class BufferingFsTranslogFile implements FsTranslogFile {
         this.raf = raf;
         this.buffer = new byte[bufferSize];
         raf.raf().setLength(0);
-        this.translogStream = TranslogStreams.translogStreamFor(this.raf.file());
+        this.translogStream = raf.translogStreamFor();
         this.headerSize = this.translogStream.writeHeader(raf.channel());
         this.lastPosition += headerSize;
         this.lastWrittenPosition += headerSize;

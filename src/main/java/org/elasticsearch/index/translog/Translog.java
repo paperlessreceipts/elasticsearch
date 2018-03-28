@@ -40,6 +40,7 @@ import org.elasticsearch.index.VersionType;
 import org.elasticsearch.index.engine.Engine;
 import org.elasticsearch.index.shard.IndexShardComponent;
 
+import java.io.File;
 import java.io.IOException;
 
 
@@ -97,6 +98,8 @@ public interface Translog extends IndexShardComponent, CloseableIndexComponent, 
      * Reverts back to not have a transient translog.
      */
     void revertTransient();
+
+    TranslogStream translogStreamFor(File translogFile) throws IOException;
 
     /**
      * Adds a create operation to the transaction log.

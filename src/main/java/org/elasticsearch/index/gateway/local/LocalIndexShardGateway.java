@@ -248,7 +248,7 @@ public class LocalIndexShardGateway extends AbstractIndexShardComponent implemen
                 logger.trace("recovering translog file: {} length: {}", recoveringTranslogFile, recoveringTranslogFile.length());
             }
             try {
-                TranslogStream stream = TranslogStreams.translogStreamFor(recoveringTranslogFile);
+                TranslogStream stream = indexShard.translog().translogStreamFor(recoveringTranslogFile);
                 try {
                     in = stream.openInput(recoveringTranslogFile);
                 } catch (TruncatedTranslogException e) {
